@@ -1,4 +1,4 @@
-from firebase_functions import https_fn
+from firebase_functions import https_fn, options
 from firebase_admin import initialize_app
 import json
 import csv
@@ -66,7 +66,12 @@ def recommend_store_by_station(
     return [elem[1] for elem in sorted_store_distance_list[:10]]
 
 
-@https_fn.on_request()
+@https_fn.on_request(
+    cors=options.CorsOptions(
+        cors_origins=[r"cheers-connect-e3c35.web.app", r"http://localhost:3000"],
+        cors_methods=["get", "post"]
+    )
+)
 def execute(req: https_fn.Request) -> https_fn.Response:
     req_param_dict = req.args.to_dict()
     station_detail_list, store_detail_list, station_store_distance = road_data()
