@@ -68,7 +68,7 @@ def recommend_store_by_station(
 
 @https_fn.on_request(
     cors=options.CorsOptions(
-        cors_origins=[r"cheers-connect-e3c35.web.app", r"http://localhost:3000"],
+        cors_origins=[r"https://cheers-connect-e3c35.web.app", r"http://localhost:3000", r"https://cheers-connect-e3c35--.*-.*.web.app"],
         cors_methods=["get", "post"]
     )
 )
