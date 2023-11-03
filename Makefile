@@ -8,4 +8,4 @@ start-local-emulator:
 
 .PHONY: request-to-local-emulator
 request-to-local-emulator:
-	curl "http://127.0.0.1:5001/cheers-connect-db-sandbox/us-central1/execute?station_id=30&search_radius=500"
+	curl "http://127.0.0.1:5001/cheers-connect-db-sandbox/us-central1/execute?station_id=00005767&search_radius=500"
