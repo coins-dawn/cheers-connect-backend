@@ -5,36 +5,11 @@ from firebase_admin import initialize_app
 from model.station_detail_list import StationDetailList
 from model.store_detail_list import StoreDetailList
 from model.station_store_distance import StationStoreDistance
+from data_accessor.file_accessor import FileAccessor
 
 initialize_app()
 
 MAX_SEARCH_RADIUS_M = 5000  # 駅からの探索半径の最大値[m]
-
-
-def read_json_file(file_path, key_str):
-    with open(file_path, "r", encoding="utf-8") as f:
-        return json.load(f)[key_str]
-
-
-def read_csv_file(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
-
-
-def road_data() -> tuple:
-    station_detail_obj_list = read_json_file(
-        "./static/station_detail_list.json", "station_detail_list"
-    )
-    station_detail_list = StationDetailList(station_detail_obj_list)
-    store_detail_obj_list = read_json_file(
-        "./static/store_detail_list.json", "store_detail_list"
-    )
-    store_detail_list = StoreDetailList(store_detail_obj_list)
-    station_store_distance_obj_list = read_csv_file(
-        "./static/station_store_distance.csv"
-    )
-    station_store_distance = StationStoreDistance(station_store_distance_obj_list)
-    return station_detail_list, store_detail_list, station_store_distance
 
 
 def recommend_store_by_station(
@@ -80,7 +55,10 @@ def recommend_store_by_station(
 )
 def execute(req: https_fn.Request) -> https_fn.Response:
     req_param_dict = req.args.to_dict()
-    station_detail_list, store_detail_list, station_store_distance = road_data()
+    file_accessor = FileAccessor()
+    station_detail_list = file_accessor.station_detail_list
+    store_detail_list = file_accessor.store_detail_list
+    station_store_distance = file_accessor.station_store_distance
 
     if "station_id" not in req_param_dict:
         return https_fn.Response("error: station_idが指定されていません。", status=400)
