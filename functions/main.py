@@ -3,7 +3,7 @@ import csv
 from firebase_functions import https_fn, options
 from firebase_admin import initialize_app
 from data_accessor.file_accessor import FileAccessor
-from algorithm.recommend_store import RecommendStore
+from logic.recommend_store import RecommendStore
 
 initialize_app()
 
