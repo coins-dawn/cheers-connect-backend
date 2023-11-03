@@ -2,45 +2,12 @@ import json
 import csv
 from firebase_functions import https_fn, options
 from firebase_admin import initialize_app
-from model.station_detail_list import StationDetailList
-from model.store_detail_list import StoreDetailList
-from model.station_store_distance import StationStoreDistance
 from data_accessor.file_accessor import FileAccessor
+from algorithm.recommend_store import RecommendStore
 
 initialize_app()
 
 MAX_SEARCH_RADIUS_M = 5000  # 駅からの探索半径の最大値[m]
-
-
-def recommend_store_by_station(
-    station_id_str: str,
-    search_radius: int,
-    store_detail_list: StoreDetailList,
-    station_store_distance: StationStoreDistance,
-) -> dict:
-    store_distance_list = station_store_distance.get_store_distance_list(station_id_str)
-    distance_filtered_store_distance_list = list(
-        filter(lambda x: int(x[1]) <= search_radius, store_distance_list)
-    )
-    distance_filtered_store_id_set = {
-        elem[0] for elem in distance_filtered_store_distance_list
-    }
-    represent_drink_enable_store_list = []
-    for elem in store_detail_list.store_detail_obj_list:
-        if str(elem["id"]) not in distance_filtered_store_id_set:
-            continue
-        if not elem.get("represent_drink"):
-            continue
-        price_str = elem["represent_drink"]["price"].replace("円", "")
-        if not price_str.isdecimal():
-            continue
-        price = int(price_str)
-        represent_drink_enable_store_list.append((price, elem))
-
-    sorted_store_distance_list = sorted(
-        represent_drink_enable_store_list, key=lambda x: x[0]
-    )
-    return [elem[1] for elem in sorted_store_distance_list[:10]]
 
 
 @https_fn.on_request(
@@ -78,8 +45,9 @@ def execute(req: https_fn.Request) -> https_fn.Response:
             f"error: search_radiusが最大値({MAX_SEARCH_RADIUS_M})を超えています。", status=400
         )
 
-    recommend_store_list = recommend_store_by_station(
-        station_id_str, search_radius, store_detail_list, station_store_distance
+    recommend_store = RecommendStore(store_detail_list, station_store_distance)
+    recommend_store_list = recommend_store.recommend_store_by_station(
+        station_id_str, search_radius
     )
     station_info = station_detail_list.station_detail_dict[station_id_str]
 
