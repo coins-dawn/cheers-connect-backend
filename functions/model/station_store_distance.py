@@ -1,20 +1,3 @@
-class StationDetailList:
-    def __init__(self, station_detail_obj_list) -> None:
-        self.station_detail_obj_list = station_detail_obj_list
-        self.station_detail_dict = {
-            station_detail["id"]: station_detail
-            for station_detail in station_detail_obj_list
-        }
-
-    def is_exist_id(self, target_id: str) -> bool:
-        return target_id in self.station_detail_dict
-
-
-class StoreDetailList:
-    def __init__(self, store_detail_obj_list) -> None:
-        self.store_detail_obj_list = store_detail_obj_list
-
-
 class StationStoreDistance:
     def __init__(self, station_store_distance_list) -> None:
         self.station_store_distance_dict = self.__make_station_store_distance_dict(
