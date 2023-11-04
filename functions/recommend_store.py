@@ -1,7 +1,6 @@
 import json
 from firebase_functions import https_fn
 from data_accessor.file_accessor import FileAccessor
-from logic.recommend_store import RecommendStore
 from model.station_store_distance import StationStoreDistance
 from model.store_detail_list import StoreDetailList
 

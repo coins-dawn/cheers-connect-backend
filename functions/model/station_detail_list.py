@@ -8,3 +8,6 @@ class StationDetailList:
 
     def is_exist_id(self, target_id: str) -> bool:
         return target_id in self.station_detail_dict
+
+    def search_station_by_id(self, station_id):
+        return self.station_detail_dict[station_id]

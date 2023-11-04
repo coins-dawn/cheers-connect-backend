@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -7,3 +7,7 @@ class Transit:
     dst_station_id: str
     transit_time_sec: int
     station_id_sequence: str
+
+    @staticmethod
+    def to_dict(obj):
+        return asdict(obj)

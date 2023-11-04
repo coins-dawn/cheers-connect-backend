@@ -7,6 +7,7 @@ from model.station_store_distance import StationStoreDistance
 STATION_DETAIL_FILE = "./static/station_detail_list.json"
 STORE_DETAIL_FILE = "./static/store_detail_list.json"
 STATION_STORE_DISTANCE_FILE = "./static/station_store_distance.csv"
+NEIGHBOORHOOD_STATION_FILE = "./static/neighborhood_station.json"
 
 
 def read_json_file(file_path, key_str):
@@ -30,4 +31,7 @@ class FileAccessor:
         station_store_distance_obj_list = read_csv_file(STATION_STORE_DISTANCE_FILE)
         self.station_store_distance = StationStoreDistance(
             station_store_distance_obj_list
+        )
+        self.neighboor_station_dict = read_json_file(
+            NEIGHBOORHOOD_STATION_FILE, "station_neighboorhood_dict"
         )

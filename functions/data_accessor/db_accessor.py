@@ -1,6 +1,5 @@
 import sqlite3
 import sys
-
 from model.transit import Transit
 
 DB_PATH = "./static/transit.db"

@@ -1,6 +1,7 @@
 from firebase_functions import https_fn, options
 from firebase_admin import initialize_app
 from recommend_store import recommend_store
+from search_route import search_route
 
 initialize_app()
 
@@ -20,5 +21,7 @@ def execute(req: https_fn.Request) -> https_fn.Response:
         return https_fn.Response("It works!", status=200)
     elif req.path == "/recommend-store":
         return recommend_store(req)
+    elif req.path == "/search-route":
+        return search_route(req)
     else:
         return https_fn.Response("Path is wrong!", status=400)
