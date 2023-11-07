@@ -23,7 +23,7 @@ def recommend_store(req: https_fn.Request):
         db_accessor,
     )
     recommend_store = RecommendStore(
-        file_accessor.store_detail_list, file_accessor.station_store_distance, dijkstra
+        file_accessor.store_details, file_accessor.station_store_distance, dijkstra
     )
     recommend_store_list = recommend_store.recommend_store(param)
 
@@ -31,7 +31,9 @@ def recommend_store(req: https_fn.Request):
         json.dumps(
             {
                 "request_param": req_param_dict,
-                "recommend_store_list": recommend_store_list,
+                "recommend_store_list": [
+                    {"id": elem.id, "name": elem.name} for elem in recommend_store_list
+                ],
             },
             ensure_ascii=False,
             indent=2,

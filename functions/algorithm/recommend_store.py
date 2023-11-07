@@ -1,23 +1,19 @@
 from algorithm.dijkstra import Dijkstra
 from model.station_store_distance import StationStoreDistance
-from model.store_detail_list import StoreDetailList
+from model.store_detail import StoreDetails
 from model.request_parameter import RecommendStoreParameter
 
 
 class RecommendStore:
     def __init__(
         self,
-        store_detail_list: StoreDetailList,
+        store_details: StoreDetails,
         station_store_distance: StationStoreDistance,
         dijkstra: Dijkstra,
     ) -> None:
-        self.store_detail_list = store_detail_list
+        self.store_details = store_details
         self.station_store_distance = station_store_distance
         self.dijkstra = dijkstra
-
-    def filtered_store_list(self, param):
-        for store_detail in self.store_detail_list.store_detail_obj_list:
-            pass
 
     def recommend_store(self, param: RecommendStoreParameter) -> dict:
         store_distance_list = self.station_store_distance.get_store_distance_list(
@@ -30,15 +26,12 @@ class RecommendStore:
             elem[0] for elem in distance_filtered_store_distance_list
         }
         represent_drink_enable_store_list = []
-        for elem in self.store_detail_list.store_detail_obj_list:
-            if str(elem["id"]) not in distance_filtered_store_id_set:
+        for elem in self.store_details.store_detail_list:
+            if str(elem.id) not in distance_filtered_store_id_set:
                 continue
-            if not elem.get("represent_drink"):
+            if not elem.represent_drink:
                 continue
-            price_str = elem["represent_drink"]["price"].replace("円", "")
-            if not price_str.isdecimal():
-                continue
-            price = int(price_str)
+            price = elem.represent_drink.price
             represent_drink_enable_store_list.append((price, elem))
 
         sorted_store_distance_list = sorted(
