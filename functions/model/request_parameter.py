@@ -1,4 +1,4 @@
-from model.station_detail_list import StationDetailList
+from model.station_detail import StationDetails
 
 
 class RecommendStoreParameter:
@@ -6,10 +6,8 @@ class RecommendStoreParameter:
     MAX_BUDGET = 100000  # 予算の最大値[円]
     MAX_TRANSIT_TIME_MINUTE = 600  # 電車での移動時間の最大値[分]
 
-    def __init__(
-        self, req_param_dict: dict, station_detail_list: StationDetailList
-    ) -> None:
-        self.station_detail_list = station_detail_list
+    def __init__(self, req_param_dict: dict, station_details: StationDetails) -> None:
+        self.station_details = station_details
         self.station_id_list = self.__get_station_id_list(req_param_dict)
         self.search_radius = self.__get_search_radius(req_param_dict)
         self.genre_code_list = []  # TODO: 実装する
@@ -37,7 +35,7 @@ class RecommendStoreParameter:
         station_id_str = req_param_dict["station_id"]
         station_id_list = station_id_str.split("-")
         for station_id in station_id_list:
-            if not self.station_detail_list.is_exist_id(station_id):
+            if not self.station_details.is_exist_id(station_id):
                 raise Exception(f"error! 存在しないstation_id({station_id})が指定されています。")
         return station_id_list
 

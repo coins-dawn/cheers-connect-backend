@@ -12,15 +12,13 @@ def recommend_store(req: https_fn.Request):
     file_accessor = FileAccessor()
 
     try:
-        param = RecommendStoreParameter(
-            req_param_dict, file_accessor.station_detail_list
-        )
+        param = RecommendStoreParameter(req_param_dict, file_accessor.station_details)
     except Exception as e:
         return https_fn.Response(e.__str__(), status=400)
 
     db_accessor = DBAccessor()
     dijkstra = Dijkstra(
-        file_accessor.station_detail_list,
+        file_accessor.station_details,
         file_accessor.neighboor_station_dict,
         db_accessor,
     )

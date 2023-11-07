@@ -13,7 +13,3 @@ request-to-local-emulator:
 .PHONY: sample-req-search-route
 sample-req-search-route:
 	curl "http://127.0.0.1:5001/cheers-connect-db-sandbox/us-central1/execute/search-route?org_station_id=00006599&dst_station_id=00007820"
-
-.PHONY: test
-test:
-	pytest -s

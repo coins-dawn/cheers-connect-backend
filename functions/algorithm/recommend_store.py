@@ -15,6 +15,10 @@ class RecommendStore:
         self.station_store_distance = station_store_distance
         self.dijkstra = dijkstra
 
+    def filtered_store_list(self, param):
+        for store_detail in self.store_detail_list.store_detail_obj_list:
+            pass
+
     def recommend_store(self, param: RecommendStoreParameter) -> dict:
         store_distance_list = self.station_store_distance.get_store_distance_list(
             param.station_id_list[0]

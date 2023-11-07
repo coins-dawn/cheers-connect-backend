@@ -1,6 +1,5 @@
 from model.transit import Transit
-from model.station_detail import StationDetail
-from model.station_detail_list import StationDetailList
+from model.station_detail import StationDetail, StationDetails
 from data_accessor.db_accessor import DBAccessor
 
 
@@ -83,18 +82,18 @@ class Dijkstra:
 
     def __init__(
         self,
-        station_detail_list: StationDetailList,
+        station_details: StationDetails,
         neighboorhood_station_dict: dict,
         db_accessor: DBAccessor,
     ) -> None:
         self.station_detail_list = [
             StationDetail(
-                id=elem["id"],
-                name=elem["name"],
-                coord_str=elem["coord"],
-                kana=elem["kana"],
+                id=elem.id,
+                name=elem.name,
+                coord_str=elem.coord,
+                kana=elem.kana,
             )
-            for elem in station_detail_list.station_detail_obj_list
+            for elem in station_details.station_detail_list
         ]
         self.station_neighborhood_dict = neighboorhood_station_dict
         self.expand_target_list_dict = self.calc_expand_target_list_dict(db_accessor)
