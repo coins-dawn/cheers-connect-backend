@@ -1,5 +1,6 @@
 from model.transit import Transit
 from model.station_detail import StationDetail
+from model.station_detail_list import StationDetailList
 from data_accessor.db_accessor import DBAccessor
 
 
@@ -81,7 +82,10 @@ class Dijkstra:
     transferable_distance_threshold = 200  # [m]
 
     def __init__(
-        self, station_detail_list, neighboorhood_station_dict, db_accessor: DBAccessor
+        self,
+        station_detail_list: StationDetailList,
+        neighboorhood_station_dict: dict,
+        db_accessor: DBAccessor,
     ) -> None:
         self.station_detail_list = [
             StationDetail(
@@ -90,7 +94,7 @@ class Dijkstra:
                 coord_str=elem["coord"],
                 kana=elem["kana"],
             )
-            for elem in station_detail_list
+            for elem in station_detail_list.station_detail_obj_list
         ]
         self.station_neighborhood_dict = neighboorhood_station_dict
         self.expand_target_list_dict = self.calc_expand_target_list_dict(db_accessor)
