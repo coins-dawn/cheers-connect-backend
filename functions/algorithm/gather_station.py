@@ -8,7 +8,7 @@ class GatherStation:
         self.transit_dict = self.__calc_transit_dict(station_id_list, dijkstra)
 
     @staticmethod
-    def __calc_transit_dict(station_id_list: list[str], dijkstra: Dijkstra):
+    def __calc_transit_dict(station_id_list: list[str], dijkstra: Dijkstra) -> dict:
         transit_dict = {}
         for station_id in station_id_list:
             org_to_every_station_transit_list = (
@@ -17,13 +17,15 @@ class GatherStation:
             for transit in org_to_every_station_transit_list:
                 org_station_id = transit.org_station_id
                 dst_station_id = transit.dst_station_id
+                if org_station_id == dst_station_id:
+                    continue
                 if dst_station_id in transit_dict:
                     transit_dict[dst_station_id][
                         org_station_id
-                    ] = transit.transit_time_sec
+                    ] = transit.transit_time_min
                 else:
-                    transit_dict[dst_station_id][org_station_id] = {
-                        org_station_id: transit.transit_time_sec
+                    transit_dict[dst_station_id] = {
+                        org_station_id: transit.transit_time_min
                     }
         # 乗る駅のいずれかから到達不可能な駅は削除
         return {

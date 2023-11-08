@@ -51,7 +51,7 @@ def transit_to_response_obj(transit: Transit, station_details: StationDetails):
     return {
         "org_station": {"id": transit.org_station_id, "name": org_station_obj.name},
         "dst_station": {"id": transit.dst_station_id, "name": dst_station_obj.name},
-        "transit_time_minute": int(transit.transit_time_sec / 60),
+        "transit_time_minute": transit.transit_time_min,
         "station_list": station_list,
     }
 

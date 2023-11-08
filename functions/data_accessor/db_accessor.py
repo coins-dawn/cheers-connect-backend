@@ -33,7 +33,8 @@ class DBAccessor:
             Transit(
                 org_station_id=elem[0],
                 dst_station_id=elem[1],
-                transit_time_sec=elem[2],
+                # TODO: DBに入っている値を分単位にする
+                transit_time_min=(elem[2] / 60),
                 station_id_sequence=elem[3],
             )
             for elem in raw_result_list

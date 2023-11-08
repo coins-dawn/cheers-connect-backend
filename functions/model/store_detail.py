@@ -7,6 +7,14 @@ class Drink:
         self.extra_info = extra_info
         self.genre_name = genre_name
 
+    def __dict__(self):
+        return {
+            "name": self.name,
+            "price": self.price,
+            "extra_info": self.extra_info,
+            "genre_name": self.genre_name,
+        }
+
 
 class StoreDetail:
     def __init__(
@@ -56,6 +64,25 @@ class StoreDetail:
         self.url = url
         self.represent_drink = drink
 
+    def __dict__(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "genre": self.genre,
+            "description": self.description,
+            "area": self.area,
+            "rate": self.rate,
+            "coord": self.coord,
+            "comment_num": self.comment_num,
+            "save_num": self.save_num,
+            "dinner_budget_lower_limit": self.dinner_budget_lower_limit,
+            "dinner_budget_upper_limit": self.dinner_budget_upper_limit,
+            "lunch_budget_lower_limit": self.lunch_budget_lower_limit,
+            "lunch_budget_upper_limit": self.lunch_budget_upper_limit,
+            "url": self.url,
+            "represent_drink": self.represent_drink.__dict__(),
+        }
+
 
 class StoreDetails:
     def __init__(self, store_detail_obj_list: list) -> None:
@@ -68,16 +95,17 @@ class StoreDetails:
         store_detail_list = []
         for elem in store_detail_obj_list:
             represent_drink = None
-            if elem["represent_drink"]:
-                represent_drink = Drink(
-                    name=elem["represent_drink"]["drink_name"],
-                    price_str=elem["represent_drink"]["price"],
-                    extra_info=elem["represent_drink"]["extra_info"],
-                    genre_name=elem["represent_drink"]["genre_name"],
-                )
+            if not elem["represent_drink"]:
+                continue
+            represent_drink = Drink(
+                name=elem["represent_drink"]["drink_name"],
+                price_str=elem["represent_drink"]["price"],
+                extra_info=elem["represent_drink"]["extra_info"],
+                genre_name=elem["represent_drink"]["genre_name"],
+            )
             store_detail_list.append(
                 StoreDetail(
-                    id=elem["id"],
+                    id=str(elem["id"]),
                     store_name=elem["store_name"],
                     genre_str=elem["genre"],
                     description=elem["description"],

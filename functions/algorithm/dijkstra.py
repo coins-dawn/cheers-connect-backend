@@ -8,13 +8,13 @@ class TransitPath:
         self,
         org_station_id,
         dst_station_id,
-        transit_time_sec,
+        transit_time_min,
         station_id_sequence,
         is_transfer,
     ):
         self.org_station_id = org_station_id
         self.dst_station_id = dst_station_id
-        self.transit_time_sec = transit_time_sec
+        self.transit_time_min = transit_time_min
         self.station_id_sequence = station_id_sequence
         self.is_transfer = is_transfer
 
@@ -34,7 +34,7 @@ class TransitPath:
         今は固定で10分で返すが、将来的には駅の特性や直通運転も考慮したい。
         """
         if self.is_transfer:
-            return 10 * 60  # sec
+            return 10  # min
         # 乗り換えでない場合は0
         return 0
 
@@ -42,7 +42,7 @@ class TransitPath:
         return Transit(
             org_station_id=self.org_station_id,
             dst_station_id=self.dst_station_id,
-            transit_time_sec=self.transit_time_sec,
+            transit_time_min=self.transit_time_min,
             station_id_sequence=self.station_id_sequence,
         )
 
@@ -65,8 +65,8 @@ class TransitPath:
                     TransitPath(
                         org_station_id=self.org_station_id,
                         dst_station_id=expand_target.dst_station_id,
-                        transit_time_sec=self.transit_time_sec
-                        + expand_target.transit_time_sec
+                        transit_time_min=self.transit_time_min
+                        + expand_target.transit_time_min
                         + self.calc_transfer_time(),
                         station_id_sequence=self.station_id_sequence
                         + commma
@@ -120,8 +120,8 @@ class Dijkstra:
             min_cost = 999999999999
             min_cost_path = None
             for open_path in open_path_list:
-                if min_cost > open_path.transit_time_sec:
-                    min_cost = open_path.transit_time_sec
+                if min_cost > open_path.transit_time_min:
+                    min_cost = open_path.transit_time_min
                     min_cost_path = open_path
             return min_cost_path
 
@@ -143,8 +143,8 @@ class Dijkstra:
                     continue
                 if dst_station_id in open_path_list_dict:
                     if (
-                        open_path_list_dict[dst_station_id].transit_time_sec
-                        > transit_path.transit_time_sec
+                        open_path_list_dict[dst_station_id].transit_time_min
+                        > transit_path.transit_time_min
                     ):
                         open_path_list_dict[dst_station_id] = transit_path
                 else:

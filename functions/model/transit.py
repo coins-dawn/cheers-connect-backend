@@ -5,7 +5,7 @@ from dataclasses import dataclass, asdict
 class Transit:
     org_station_id: str
     dst_station_id: str
-    transit_time_sec: int
+    transit_time_min: int
     station_id_sequence: str
 
     @staticmethod

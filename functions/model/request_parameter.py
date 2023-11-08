@@ -2,14 +2,18 @@ from model.station_detail import StationDetails
 
 
 class RecommendStoreParameter:
-    MAX_SEARCH_RADIUS_M = 5000  # 駅からの探索半径の最大値[m]
-    MAX_BUDGET = 100000  # 予算の最大値[円]
+    MAX_SEARCH_RADIUS_M = 5000  # 駅からの店舗の直線距離の最大値[m]
+    MAX_BUDGET = 1000000  # 予算の最大値[円]
     MAX_TRANSIT_TIME_MINUTE = 600  # 電車での移動時間の最大値[分]
 
     def __init__(self, req_param_dict: dict, station_details: StationDetails) -> None:
         self.station_details = station_details
         self.station_id_list = self.__get_station_id_list(req_param_dict)
-        self.search_radius = self.__get_search_radius(req_param_dict)
+        self.nearest_station_distance_limit = self.__get_optional_num_parameter(
+            req_param_dict,
+            "nearest_station_distance_limit",
+            RecommendStoreParameter.MAX_SEARCH_RADIUS_M,
+        )
         self.genre_code_list = []  # TODO: 実装する
         self.budget = self.__get_optional_num_parameter(
             req_param_dict, "budget", RecommendStoreParameter.MAX_BUDGET
@@ -28,6 +32,11 @@ class RecommendStoreParameter:
         self.free_word = (
             req_param_dict["free_word"] if "free_word" in req_param_dict else ""
         )
+        self.min_rate = (
+            float(req_param_dict["min_rate"])
+            if "min_rate" in req_param_dict and req_param_dict["min_rate"] != "-"
+            else 0.0
+        )
 
     def __get_station_id_list(self, req_param_dict):
         if "station_id" not in req_param_dict:
@@ -38,19 +47,6 @@ class RecommendStoreParameter:
             if not self.station_details.is_exist_id(station_id):
                 raise Exception(f"error! 存在しないstation_id({station_id})が指定されています。")
         return station_id_list
-
-    def __get_search_radius(self, req_param_dict):
-        if "search_radius" not in req_param_dict:
-            raise Exception("error! search_radiusが指定されていません。")
-        search_radius_str = req_param_dict["search_radius"]
-        if not search_radius_str.isdecimal():
-            raise Exception("error! search_radiusが数値ではありません。")
-        search_radius = int(search_radius_str)
-        if search_radius > RecommendStoreParameter.MAX_SEARCH_RADIUS_M:
-            raise Exception(
-                f"error! search_radiusが最大値{RecommendStoreParameter.MAX_SEARCH_RADIUS_M}を超えています。"
-            )
-        return search_radius
 
     def __get_optional_num_parameter(self, req_param_dict, param_name, default_value):
         if param_name not in req_param_dict:
