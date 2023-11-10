@@ -1,4 +1,5 @@
 from model.station_detail import StationDetails
+from model.genre_code import GenreCodes
 
 
 class RecommendStoreParameter:
@@ -6,15 +7,21 @@ class RecommendStoreParameter:
     MAX_BUDGET = 1000000  # 予算の最大値[円]
     MAX_TRANSIT_TIME_MINUTE = 600  # 電車での移動時間の最大値[分]
 
-    def __init__(self, req_param_dict: dict, station_details: StationDetails) -> None:
-        self.station_details = station_details
-        self.station_id_list = self.__get_station_id_list(req_param_dict)
+    def __init__(
+        self,
+        req_param_dict: dict,
+        station_details: StationDetails,
+        genre_codes: GenreCodes,
+    ) -> None:
+        self.station_id_list = self.__get_station_id_list(
+            req_param_dict, station_details
+        )
         self.nearest_station_distance_limit = self.__get_optional_num_parameter(
             req_param_dict,
             "nearest_station_distance_limit",
             RecommendStoreParameter.MAX_SEARCH_RADIUS_M,
         )
-        self.genre_code_list = []  # TODO: 実装する
+        self.genre_code_list = self.__get_genre_code_list(req_param_dict, genre_codes)
         self.budget = self.__get_optional_num_parameter(
             req_param_dict, "budget", RecommendStoreParameter.MAX_BUDGET
         )
@@ -38,15 +45,24 @@ class RecommendStoreParameter:
             else 0.0
         )
 
-    def __get_station_id_list(self, req_param_dict):
+    def __get_station_id_list(self, req_param_dict, station_details: StationDetails):
         if "station_id" not in req_param_dict:
             raise Exception("error! station_idが指定されていません。")
         station_id_str = req_param_dict["station_id"]
         station_id_list = station_id_str.split("-")
         for station_id in station_id_list:
-            if not self.station_details.is_exist_id(station_id):
+            if not station_details.is_exist_id(station_id):
                 raise Exception(f"error! 存在しないstation_id({station_id})が指定されています。")
         return station_id_list
+
+    def __get_genre_code_list(self, req_param_dict, genre_codes: GenreCodes):
+        if "genre_code" not in req_param_dict:
+            return []
+        genre_code_list = req_param_dict["genre_code"].split("-")
+        for genre_code in genre_code_list:
+            if not genre_codes.is_exist_code(genre_code):
+                raise Exception(f"error! 存在しないgenre_code({genre_code})が指定されています。")
+        return genre_code_list
 
     def __get_optional_num_parameter(self, req_param_dict, param_name, default_value):
         if param_name not in req_param_dict:

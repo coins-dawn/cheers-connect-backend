@@ -3,6 +3,7 @@ from model.station_store_distance import StationStoreDistance
 from model.store_detail import StoreDetail, StoreDetails
 from model.request_parameter import RecommendStoreParameter
 from model.store_with_transit import StoreWithTransit
+from model.genre_code import GenreCodes
 
 RESPONSE_RECOMMEND_STORE_SIZE = 100  # 返却する店舗の最大個数
 
@@ -13,17 +14,19 @@ class RecommendStore:
         store_details: StoreDetails,
         station_store_distance: StationStoreDistance,
         gather_station: GatherStation,
+        genre_codes: GenreCodes,
     ) -> None:
         self.store_details = store_details
         self.station_store_distance = station_store_distance
         self.gather_station = gather_station
+        self.genre_codes = genre_codes
 
-    @staticmethod
     def filter_by_store_attribute(
-        param: RecommendStoreParameter, store_details: StoreDetails
+        self,
+        param: RecommendStoreParameter,
     ) -> list[StoreDetail]:
         filtered_store_list = []
-        for store_detail in store_details.store_detail_list:
+        for store_detail in self.store_details.store_detail_list:
             if store_detail.dinner_budget_lower_limit > param.budget:
                 continue
             if store_detail.comment_num < param.min_comment_num:
@@ -37,7 +40,9 @@ class RecommendStore:
                 and param.free_word not in store_detail.description
             ):
                 continue
-            # TODO: genreについての条件を追加する
+            if param.genre_code_list:
+                if not self.genre_codes.intersection(set(param.genre_code_list)):
+                    continue
             filtered_store_list.append(store_detail)
         return filtered_store_list
 
@@ -70,8 +75,8 @@ class RecommendStore:
         )
 
     def recommend_store(self, param: RecommendStoreParameter) -> list[StoreWithTransit]:
-        filtered_by_store_attribute_list = RecommendStore.filter_by_store_attribute(
-            param, self.store_details
+        filtered_by_store_attribute_list = self.filter_by_store_attribute(
+            param,
         )
         filtered_by_location_list = self.filtered_by_store_location(
             param, filtered_by_store_attribute_list

@@ -35,7 +35,7 @@ class StoreDetail:
     ) -> None:
         self.id = id
         self.name = store_name
-        self.genre = genre_str
+        self.genre_name_list = genre_str.split("、")
         self.description = description
         self.area = area
         self.rate = float(rate_str) if rate_str and rate_str != "-" else 0
@@ -68,7 +68,7 @@ class StoreDetail:
         return {
             "id": self.id,
             "name": self.name,
-            "genre": self.genre,
+            "genre": self.genre_name_list,
             "description": self.description,
             "area": self.area,
             "rate": self.rate,
