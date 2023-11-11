@@ -1,9 +1,9 @@
 from algorithm.gather_station import GatherStation
-from model.station_store_distance import StationStoreDistance
 from model.store_detail import StoreDetail, StoreDetails
 from model.request_parameter import RecommendStoreParameter
 from model.store_with_transit import StoreWithTransit
 from model.genre_code import GenreCodes
+from model.nearest_stations import NearestStations
 
 RESPONSE_RECOMMEND_STORE_SIZE = 100  # 返却する店舗の最大個数
 
@@ -12,12 +12,12 @@ class RecommendStore:
     def __init__(
         self,
         store_details: StoreDetails,
-        station_store_distance: StationStoreDistance,
+        nearest_stations: NearestStations,
         gather_station: GatherStation,
         genre_codes: GenreCodes,
     ) -> None:
         self.store_details = store_details
-        self.station_store_distance = station_store_distance
+        self.nearest_stations = nearest_stations
         self.gather_station = gather_station
         self.genre_codes = genre_codes
 
@@ -54,7 +54,7 @@ class RecommendStore:
         for store_detail in store_detail_list:
             store_with_transit = StoreWithTransit(
                 store_detail=store_detail,
-                station_store_distance=self.station_store_distance,
+                nearest_stations=self.nearest_stations,
                 gather_station=self.gather_station,
             )
             if store_with_transit.is_invalid():

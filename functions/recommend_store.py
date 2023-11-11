@@ -81,7 +81,7 @@ def recommend_store(req: https_fn.Request) -> https_fn.Response:
     gather_station = GatherStation(param.station_id_list, dijkstra)
     recommend_store = RecommendStore(
         file_accessor.store_details,
-        file_accessor.station_store_distance,
+        file_accessor.nearest_stations,
         gather_station,
         file_accessor.genre_codes,
     )
