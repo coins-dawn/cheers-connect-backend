@@ -39,12 +39,15 @@ def create_response(
     }
     search_result = [
         {
-            "nearest_station_id": elem.nearest_station_id,
-            "nearest_station_name": station_details.search_station_by_id(
-                elem.nearest_station_id
-            ).name,
-            "transit_time": elem.transit_time_to_enter_stations,
             "store_detail": elem.store_detail.__dict__(),
+            "transit_time": elem.transit_time_to_enter_stations,
+            "nearest_station": {
+                "id": elem.nearest_station_id,
+                "name": station_details.search_station_by_id(
+                    elem.nearest_station_id
+                ).name,
+                "distance_m": elem.nearest_station_distance_m,
+            },
         }
         for elem in recommend_store_list
     ]
