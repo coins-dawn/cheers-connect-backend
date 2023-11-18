@@ -3,11 +3,13 @@ import json
 from model.station_detail import StationDetails
 from model.store_detail import StoreDetails
 from model.station_store_distance import StationStoreDistance
+from model.genre_code import GenreCodes
 
 STATION_DETAIL_FILE = "./static/station_detail_list.json"
 STORE_DETAIL_FILE = "./static/store_detail_list.json"
 STATION_STORE_DISTANCE_FILE = "./static/station_store_distance.csv"
 NEIGHBOORHOOD_STATION_FILE = "./static/neighborhood_station.json"
+GENRE_CODE_FILE = "./static/genre_code.json"
 
 
 def read_json_file(file_path, key_str):
@@ -35,3 +37,5 @@ class FileAccessor:
         self.neighboor_station_dict = read_json_file(
             NEIGHBOORHOOD_STATION_FILE, "station_neighboorhood_dict"
         )
+        genre_code_list = read_json_file(GENRE_CODE_FILE, "genre_code_list")
+        self.genre_codes = GenreCodes(genre_code_list)
