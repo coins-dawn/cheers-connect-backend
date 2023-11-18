@@ -1,5 +1,6 @@
 class StationStoreDistance:
     def __init__(self, station_store_distance_list) -> None:
+        # station_id -> store_id -> distance_m
         self.station_store_distance_dict = self.__make_station_store_distance_dict(
             station_store_distance_list
         )
@@ -9,7 +10,7 @@ class StationStoreDistance:
         for elem in station_store_distance_list:
             station_id = elem["station_id"]
             store_id = elem["store_id"]
-            distance = elem["distance_m"]
+            distance = int(elem["distance_m"])
             if station_id not in station_store_distance_dict:
                 station_store_distance_dict[station_id] = {}
             if store_id not in station_store_distance_dict[station_id]:

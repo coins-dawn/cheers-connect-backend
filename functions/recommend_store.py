@@ -1,104 +1,79 @@
 import json
 from firebase_functions import https_fn
+from algorithm.dijkstra import Dijkstra
+from algorithm.gather_station import GatherStation
+from algorithm.recommend_store import RecommendStore
 from data_accessor.file_accessor import FileAccessor
-from model.station_store_distance import StationStoreDistance
-from model.store_detail_list import StoreDetailList
+from data_accessor.db_accessor import DBAccessor
+from model.request_parameter import RecommendStoreParameter
+from model.store_with_transit import StoreWithTransit
+from model.station_detail import StationDetails
 
 
-MAX_SEARCH_RADIUS_M = 5000  # 駅からの探索半径の最大値[m]
-
-
-class RecommendStore:
-    def __init__(
-        self,
-        store_detail_list: StoreDetailList,
-        station_store_distance: StationStoreDistance,
-    ) -> None:
-        self.store_detail_list = store_detail_list
-        self.station_store_distance = station_store_distance
-
-    def recommend_store_by_station(
-        self,
-        station_id_str: str,
-        search_radius: int,
-    ) -> dict:
-        store_distance_list = self.station_store_distance.get_store_distance_list(
-            station_id_str
-        )
-        distance_filtered_store_distance_list = list(
-            filter(lambda x: int(x[1]) <= search_radius, store_distance_list)
-        )
-        distance_filtered_store_id_set = {
-            elem[0] for elem in distance_filtered_store_distance_list
+def create_response(
+    param: RecommendStoreParameter,
+    recommend_store_list: list[StoreWithTransit],
+    station_details: StationDetails,
+) -> https_fn.Response:
+    search_conditions = {
+        "station_list": [
+            {
+                "id": station_id,
+                "name": station_details.search_station_by_id(station_id).name,
+            }
+            for station_id in param.station_id_list
+        ],
+        "nearest_station_distance_limit": param.nearest_station_distance_limit,
+        "genre_code_list": param.genre_code_list,
+        "budget": param.budget,
+        "min_comment_num": param.min_comment_num,
+        "min_save_num": param.min_save_num,
+        "max_transit_time_minute": param.max_transit_time_minute,
+        "free_word": param.free_word,
+        "min_rate": param.min_rate,
+    }
+    search_result = [
+        {
+            "nearest_station_id": elem.nearest_station_id,
+            "nearest_station_name": station_details.search_station_by_id(
+                elem.nearest_station_id
+            ).name,
+            "transit_time": elem.transit_time_to_enter_stations,
+            "store_detail": elem.store_detail.__dict__(),
         }
-        represent_drink_enable_store_list = []
-        for elem in self.store_detail_list.store_detail_obj_list:
-            if str(elem["id"]) not in distance_filtered_store_id_set:
-                continue
-            if not elem.get("represent_drink"):
-                continue
-            price_str = elem["represent_drink"]["price"].replace("円", "")
-            if not price_str.isdecimal():
-                continue
-            price = int(price_str)
-            represent_drink_enable_store_list.append((price, elem))
-
-        sorted_store_distance_list = sorted(
-            represent_drink_enable_store_list, key=lambda x: x[0]
-        )
-        return [elem[1] for elem in sorted_store_distance_list[:10]]
-
-
-def check_request_params(req_param_dict, station_detail_list):
-    if "station_id" not in req_param_dict:
-        return False, "error: station_idが指定されていません。"
-
-    station_id_str = req_param_dict["station_id"]
-    if not station_detail_list.is_exist_id(station_id_str):
-        return False, "error: 存在しないstation_idが指定されています。"
-
-    if "search_radius" not in req_param_dict:
-        return False, "error: search_radiusが指定されていません。"
-
-    search_radius_str = req_param_dict["search_radius"]
-    if not search_radius_str.isdecimal():
-        return False, "error: search_radiusが数値ではありません。"
-
-    search_radius = int(search_radius_str)
-    if search_radius > MAX_SEARCH_RADIUS_M:
-        return False, f"error: search_radiusが最大値({MAX_SEARCH_RADIUS_M})を超えています。"
-
-    return True, ""
-
-
-def recommend_store(req: https_fn.Request):
-    req_param_dict = req.args.to_dict()
-    file_accessor = FileAccessor()
-    station_detail_list = file_accessor.station_detail_list
-    store_detail_list = file_accessor.store_detail_list
-    station_store_distance = file_accessor.station_store_distance
-
-    is_valid_params, message = check_request_params(req_param_dict, station_detail_list)
-    if not is_valid_params:
-        return https_fn.Response(message, status=400)
-
-    station_id_str = req_param_dict["station_id"]
-    search_radius = int(req_param_dict["search_radius"])
-    recommend_store = RecommendStore(store_detail_list, station_store_distance)
-    recommend_store_list = recommend_store.recommend_store_by_station(
-        station_id_str, search_radius
-    )
-    station_info = station_detail_list.station_detail_dict[station_id_str]
-
+        for elem in recommend_store_list
+    ]
     return https_fn.Response(
         json.dumps(
-            {
-                "station_info": station_info,
-                "search_radius": search_radius,
-                "recommend_store_list": recommend_store_list,
-            },
+            {"search_conditions": search_conditions, "search_result": search_result},
             ensure_ascii=False,
             indent=2,
         ),
         status=200,
     )
+
+
+def recommend_store(req: https_fn.Request) -> https_fn.Response:
+    req_param_dict = req.args.to_dict()
+    file_accessor = FileAccessor()
+
+    try:
+        param = RecommendStoreParameter(req_param_dict, file_accessor.station_details)
+    except Exception as e:
+        return https_fn.Response(e.__str__(), status=400)
+
+    db_accessor = DBAccessor()
+    dijkstra = Dijkstra(
+        file_accessor.station_details,
+        file_accessor.neighboor_station_dict,
+        db_accessor,
+    )
+    gather_station = GatherStation(param.station_id_list, dijkstra)
+    recommend_store = RecommendStore(
+        file_accessor.store_details,
+        file_accessor.station_store_distance,
+        gather_station,
+    )
+    recommend_store_list = recommend_store.recommend_store(param)
+
+    return create_response(param, recommend_store_list, file_accessor.station_details)
