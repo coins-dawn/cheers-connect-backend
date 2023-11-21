@@ -4,7 +4,8 @@ from algorithm.dijkstra import Dijkstra
 from algorithm.gather_station import GatherStation
 from algorithm.recommend_store import RecommendStore
 from data_accessor.file_accessor import FileAccessor
-from data_accessor.db_accessor import DBAccessor
+from data_accessor.transit_db_accessor import TransitDBAccessor
+from data_accessor.store_db_accessor import StoreDetailDBAccessor
 from model.request_parameter import RecommendStoreParameter
 from model.store_with_transit import StoreWithTransit
 from model.station_detail import StationDetails
@@ -72,15 +73,16 @@ def recommend_store(req: https_fn.Request) -> https_fn.Response:
     except Exception as e:
         return https_fn.Response(e.__str__(), status=400)
 
-    db_accessor = DBAccessor()
+    transit_db_accessor = TransitDBAccessor()
     dijkstra = Dijkstra(
         file_accessor.station_details,
         file_accessor.neighboor_station_dict,
-        db_accessor,
+        transit_db_accessor,
     )
     gather_station = GatherStation(param.station_id_list, dijkstra)
+    store_db_accessor = StoreDetailDBAccessor()
     recommend_store = RecommendStore(
-        file_accessor.store_details,
+        store_db_accessor,
         file_accessor.nearest_stations,
         gather_station,
         file_accessor.genre_codes,

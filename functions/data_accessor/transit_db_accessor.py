@@ -5,7 +5,7 @@ from model.transit import Transit
 DB_PATH = "./static/transit.db"
 
 
-class DBAccessor:
+class TransitDBAccessor:
     def __init__(self) -> None:
         self.conn = sqlite3.connect(DB_PATH)
         self.cur = self.conn.cursor()
