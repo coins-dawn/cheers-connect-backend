@@ -40,7 +40,9 @@ class RecommendStore:
             ):
                 continue
             if param.genre_code_list:
-                if not self.genre_codes.intersection(set(param.genre_code_list)):
+                if not self.genre_codes.intersection(
+                    store_detail, param.genre_code_list
+                ):
                     continue
             filtered_store_list.append(store_detail)
         return filtered_store_list
