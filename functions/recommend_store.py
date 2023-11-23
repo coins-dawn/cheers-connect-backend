@@ -38,6 +38,9 @@ def create_response(
         "max_transit_time_minute": param.max_transit_time_minute,
         "free_word": param.free_word,
         "min_rate": param.min_rate,
+        "store_sort_priority": str(param.store_sort_priority).lstrip(
+            "StoreWithTransitSortPriority."
+        ),
     }
     search_result = [
         {
