@@ -1,7 +1,7 @@
 class NearestStations:
     def __init__(self, nearest_station_obj_list) -> None:
         self.storeid_nearest_stationdict = {
-            elem["store_id"]: (elem["nearest_station_id"], int(elem["distance"]))
+            int(elem["store_id"]): (elem["nearest_station_id"], int(elem["distance"]))
             for elem in nearest_station_obj_list
         }
 

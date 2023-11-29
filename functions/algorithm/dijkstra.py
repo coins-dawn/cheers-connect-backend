@@ -1,6 +1,6 @@
 from model.transit import Transit
 from model.station_detail import StationDetail, StationDetails
-from data_accessor.db_accessor import DBAccessor
+from data_accessor.transit_db_accessor import TransitDBAccessor
 
 
 class TransitPath:
@@ -84,7 +84,7 @@ class Dijkstra:
         self,
         station_details: StationDetails,
         neighboorhood_station_dict: dict,
-        db_accessor: DBAccessor,
+        db_accessor: TransitDBAccessor,
     ) -> None:
         self.station_detail_list = [
             StationDetail(
@@ -98,7 +98,7 @@ class Dijkstra:
         self.station_neighborhood_dict = neighboorhood_station_dict
         self.expand_target_list_dict = self.calc_expand_target_list_dict(db_accessor)
 
-    def calc_expand_target_list_dict(self, db_accessor: DBAccessor):
+    def calc_expand_target_list_dict(self, db_accessor: TransitDBAccessor):
         expand_target_list_dict = {}
         for station in self.station_detail_list:
             expand_target_list_dict[

@@ -1,7 +1,7 @@
 import json
 from firebase_functions import https_fn
 from data_accessor.file_accessor import FileAccessor
-from data_accessor.db_accessor import DBAccessor
+from data_accessor.transit_db_accessor import TransitDBAccessor
 from algorithm.dijkstra import Dijkstra
 from model.transit import Transit
 from model.station_detail import StationDetails
@@ -61,7 +61,7 @@ def search_route(req):
     file_accessor = FileAccessor()
     station_details = file_accessor.station_details
     neighboorhood_station_dict = file_accessor.neighboor_station_dict
-    db_accessor = DBAccessor()
+    db_accessor = TransitDBAccessor()
 
     is_valid_params, message = check_request_param(req_param_dict, station_details)
     if not is_valid_params:

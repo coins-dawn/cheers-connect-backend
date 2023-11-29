@@ -1,9 +1,10 @@
 from algorithm.gather_station import GatherStation
-from model.store_detail import StoreDetail, StoreDetails
+from model.store_detail import StoreDetail
 from model.request_parameter import RecommendStoreParameter
 from model.store_with_transit import StoreWithTransit
 from model.genre_code import GenreCodes
 from model.nearest_stations import NearestStations
+from data_accessor.store_db_accessor import StoreDetailDBAccessor
 
 RESPONSE_RECOMMEND_STORE_SIZE = 100  # 返却する店舗の最大個数
 
@@ -11,12 +12,12 @@ RESPONSE_RECOMMEND_STORE_SIZE = 100  # 返却する店舗の最大個数
 class RecommendStore:
     def __init__(
         self,
-        store_details: StoreDetails,
+        store_db_accessor: StoreDetailDBAccessor,
         nearest_stations: NearestStations,
         gather_station: GatherStation,
         genre_codes: GenreCodes,
     ) -> None:
-        self.store_details = store_details
+        self.store_db_accessor = store_db_accessor
         self.nearest_stations = nearest_stations
         self.gather_station = gather_station
         self.genre_codes = genre_codes
@@ -25,23 +26,23 @@ class RecommendStore:
         self,
         param: RecommendStoreParameter,
     ) -> list[StoreDetail]:
+        base_store_list = self.store_db_accessor.filter_by_store_attributes(
+            budget=param.budget,
+            min_comment_num=param.min_comment_num,
+            min_save_num=param.min_save_num,
+            min_rate=param.min_rate,
+        )
         filtered_store_list = []
-        for store_detail in self.store_details.store_detail_list:
-            if store_detail.dinner_budget_lower_limit > param.budget:
-                continue
-            if store_detail.comment_num < param.min_comment_num:
-                continue
-            if store_detail.save_num < param.min_save_num:
-                continue
-            if store_detail.rate < param.min_rate:
-                continue
+        for store_detail in base_store_list:
             if (
                 param.free_word != ""
                 and param.free_word not in store_detail.description
             ):
                 continue
             if param.genre_code_list:
-                if not self.genre_codes.intersection(set(param.genre_code_list)):
+                if not self.genre_codes.intersection(
+                    store_detail, param.genre_code_list
+                ):
                     continue
             filtered_store_list.append(store_detail)
         return filtered_store_list
