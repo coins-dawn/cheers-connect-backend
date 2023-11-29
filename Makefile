@@ -8,7 +8,7 @@ start-local-emulator:
 
 .PHONY: sample-req-recommend-store
 sample-req-recommend-store:
-	curl "http://127.0.0.1:5001/cheers-connect-db-sandbox/us-central1/execute/recommend-store?station_id=00007820-00009451-00000813&nearest_station_distance_limit=1000&budget=5000&min_comment_num=10&max_transit_time_minute=40&min_rate=3.3&genre_code=12-43-94"
+	curl "http://127.0.0.1:5001/cheers-connect-db-sandbox/us-central1/execute/recommend-store?station_id=00007820-00009451-00000813&nearest_station_distance_limit=1000&budget=5000&min_comment_num=10&max_transit_time_minute=40&min_rate=3.3&genre_code=1-3-17&store_sort_priority=balance"
 
 .PHONY: sample-req-search-route
 sample-req-search-route:

@@ -1,5 +1,6 @@
 from model.station_detail import StationDetails
 from model.genre_code import GenreCodes
+from model.store_with_transit_sort_priority import StoreWithTransitSortPriority
 
 
 class RecommendStoreParameter:
@@ -44,6 +45,7 @@ class RecommendStoreParameter:
             if "min_rate" in req_param_dict and req_param_dict["min_rate"] != "-"
             else 0.0
         )
+        self.store_sort_priority = self.__get_store_sort_priority(req_param_dict)
 
     def __get_station_id_list(self, req_param_dict, station_details: StationDetails):
         if "station_id" not in req_param_dict:
@@ -71,6 +73,18 @@ class RecommendStoreParameter:
         if not param_str.isdecimal():
             return Exception(f"error! {param_name}が数値ではありません。")
         return int(param_str)
+
+    def __get_store_sort_priority(self, req_param_dict):
+        param_name = "store_sort_priority"
+        if param_name not in req_param_dict:
+            return StoreWithTransitSortPriority.BALANCE
+        param_str = req_param_dict[param_name]
+        if not StoreWithTransitSortPriority.is_valid_key(param_str):
+            valid_param_str = ",".join(StoreWithTransitSortPriority.valid_key_list())
+            raise Exception(
+                f"error! {param_name}が無効な値です。次のいずれかを指定してください：{valid_param_str}"
+            )
+        return StoreWithTransitSortPriority.convert_from_str(param_str)
 
 
 class SearchRouteParameter:
