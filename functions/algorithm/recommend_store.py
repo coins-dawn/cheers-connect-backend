@@ -1,5 +1,4 @@
 from algorithm.gather_station import GatherStation
-from algorithm.sort_store_with_transit import SortStoreWithTransit
 from model.store_detail import StoreDetail
 from model.request_parameter import RecommendStoreParameter
 from model.store_with_transit import StoreWithTransit
@@ -77,7 +76,11 @@ class RecommendStore:
         store_with_transit_list: StoreWithTransit,
         sort_priority: StoreWithTransitSortPriority,
     ) -> list[StoreWithTransit]:
-        return SortStoreWithTransit.sort(store_with_transit_list, sort_priority)
+        return sorted(
+            store_with_transit_list,
+            key=lambda x: x.score.get_score(sort_priority),
+            reverse=True,
+        )
 
     def recommend_store(self, param: RecommendStoreParameter) -> list[StoreWithTransit]:
         filtered_by_store_attribute_list = self.filter_by_store_attribute(

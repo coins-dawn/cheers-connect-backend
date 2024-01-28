@@ -3,7 +3,6 @@ from firebase_functions import https_fn
 from algorithm.dijkstra import Dijkstra
 from algorithm.gather_station import GatherStation
 from algorithm.recommend_store import RecommendStore
-from algorithm.sort_store_with_transit import SortStoreWithTransit
 from data_accessor.file_accessor import FileAccessor
 from data_accessor.transit_db_accessor import TransitDBAccessor
 from data_accessor.store_db_accessor import StoreDetailDBAccessor
@@ -53,8 +52,7 @@ def create_response(
                 ).name,
                 "distance_m": elem.nearest_station_distance_m,
             },
-            "store_score": SortStoreWithTransit.store_score(elem),
-            "gather_station_score": SortStoreWithTransit.gather_station_score(elem),
+            "score": elem.score.__dict__(param.store_sort_priority),
         }
         for elem in recommend_store_list
     ]
